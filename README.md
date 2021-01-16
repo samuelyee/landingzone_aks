@@ -1,51 +1,113 @@
-# Cloud Adoption Framework for Azure - Landing zones on Terraform - Azure Kubernetes Services
+# Setting Up the AKS Landing Zone
+The original instruction will create random 5-char prefixes and suffixes for every resource name. It looks ugly and messy. Instead, let's create a static prefix without any suffixes.
 
-Microsoft Cloud Adoption Framework for Azure provides you with guidance and best practices to adopt Azure.
+1. Run `Remote-Container: Reopen in Container` in VSCode
+1. Login to Azure and set the subscription
+   ```
+    rover login
+    az account set -s <subcription name>
+   ```
 
-A landing zone is a segment of a cloud environment, that has been preprovisioned through code, and is dedicated to the support of one or more workloads. Landing zones provide access to foundational tools and controls to establish a compliant place to innovate and build new workloads in the cloud, or to migrate existing workloads to the cloud. Landing zones use defined sets of cloud services and best practices to set you up for success.
+### Setting the Environment
+```bash
+export environment=STAGING
+export random_length=0 # to disable random suffixes
+export passthrough=false # set to false to enable prefix as below
+export prefix=staging
+```
 
-You can find the core Cloud Adoption Framework for Azure - Terraform landing zones here: [CAF landing zones](https://github.com/Azure/caf-terraform-landingzones/)
+### Clone the Foundation LZ
+```
+git clone --branch 2012.0.0 https://github.com/Azure/caf-terraform-landingzones.git /tf/caf/public
+```
 
-## Goals
+### Apply foundations (level 0 and 1)
 
-The Azure Kubernetes Services landing zones sits on top of Cloud Adoption Framework for Azure foundational landing zones and enables the deployment of Azure Kubernetes Services on top of it.
-With this solution, you can deploy various combinations following the examples available, including a private cluster as follow:
+```bash
+# This is a specifically tailored version of the launchpad for this example and does not typically show all the launchpad features. Here it deploy the launchpad to store the tfstates, deploy log analytics, etc.
+rover -lz /tf/caf/public/landingzones/caf_launchpad \
+  -launchpad \
+  -var-folder /tf/caf/examples/1-dependencies/launchpad/150 \
+  -level level0 \
+  -env ${environment} \
+  -var random_length=${random_length} \
+  -var passthrough=${passthrough} \
+  -var prefix=${prefix} \
+  -a [plan|apply|destroy]
 
-![solutions](./_pictures/examples/104-full.PNG)
+# Level1
+## To deploy AKS some dependencies, some accounting, security and governance services are required.
+rover -lz /tf/caf/public/landingzones/caf_foundations \
+  -level level1 \
+  -env ${environment} \
+  -a [plan|apply|destroy]
 
-## Getting Started
+# Deploy shared_services typically monitoring, site recovery services, azure image gallery. In this example we dont deploy anything but it will expose the Terraform state to level 3 landing zones, so is required.
+rover -lz /tf/caf/public/landingzones/caf_shared_services/ \
+  -tfstate caf_shared_services.tfstate \
+  -parallelism 30 \
+  -level level2 \
+  -env ${environment} \
+  -a [plan|apply]
+```
 
-Clone this repo on your local machine and follow the to [examples section](./examples) to get started and deploy an AKS landing zone.
+### Apply level 2 - network hub
 
-## Related repositories
+The networking hub is part of the core enterprise landing zone services, you can deploy it with the following command:
 
-| Repo                                                                                              | Description                                                |
-|---------------------------------------------------------------------------------------------------|------------------------------------------------------------|
-| [caf-terraform-landingzones](https://github.com/azure/caf-terraform-landingzones) | landing zones repo with sample and core documentations     |
-| [rover](https://github.com/aztfmod/rover)                                                         | devops toolset for operating landing zones                 |
-| [azure_caf_provider](https://github.com/aztfmod/terraform-provider-azurecaf)                      | custom provider for naming conventions                     |
-| [modules](https://registry.terraform.io/modules/aztfmod)                                          | set of curated modules available in the Terraform registry |
+```bash
+rover -lz /tf/caf/public/landingzones/caf_networking/ \
+  -tfstate networking_hub.tfstate \
+  -var-folder /tf/caf/public/landingzones/caf_networking/scenario/100-single-region-hub \
+  -env ${environment} \
+  -level level2 \
+  -a [plan|apply]
+```
 
-## Community
+### Apply level 3 - network spoke
 
-Feel free to open an issue for feature or bug, or to submit a PR.
+```bash
+# Deploy networking spoke for AKS
+rover -lz /tf/caf/public/landingzones/caf_networking/ \
+  -tfstate networking_spoke_aks.tfstate \
+  -var-folder /tf/caf/examples/1-dependencies/networking/spoke_aks/single_region \
+  -env ${environment} \
+  -level level3 \
+  -a [plan|apply|destroy]
 
-In case you have any question, you can reach out to tf-landingzones at microsoft dot com.
+```
+## Setup the AKS deployment
 
-You can also reach us on [Gitter](https://gitter.im/aztfmod/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+```bash
+# Set the folder name of this example
+example=101-single-cluster
 
-## Contributing
+rover -lz /tf/caf/ \
+  -tfstate landingzone_aks.tfstate \
+  -var-folder /tf/caf/examples/aks/${example} \
+  -var tags={example=\"${example}\"} \
+  -var prefix=${prefix} \
+  -env ${environment} \
+  -level level3 \
+  -a [plan|apply]
+```
+### To destroy
+```
+example=101-single-cluster
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+rover -lz /tf/caf/ \
+  -tfstate landingzone_aks.tfstate \
+  -var-folder /tf/caf/examples/aks/${example} \
+  -var tags={example=\"${example}\"} \
+  -var prefix=${prefix} \
+  -env ${environment} \
+  -level level3 \
+  -a destroy -auto-approve
+```
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-## Code of conduct
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+### Install ingress-nginx and cert-manager in K8S
+Refer to README under `examples\applications\ingress-nginx`
+## Login to AKS
+```
+az aks get-credentials --resource-group staging-rg-aks-re1 --name staging-aks-akscluster-re1 --admin --overwrite
+```

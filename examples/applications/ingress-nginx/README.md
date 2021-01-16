@@ -1,4 +1,4 @@
-# ArgoCD
+# Ingress Nginx and Cert Manager
 
 Deploys Applications on top of an AKS Landing zone
 
@@ -12,43 +12,40 @@ Ensure the below is set prior to apply or destroy.
 rover login -t [TENANT_ID/TENANT_NAME] -s [SUBSCRIPTION_GUID]
 # Environment is needed to be defined, otherwise the below LZs will land into sandpit which someone else is working on
 export environment=[YOUR_ENVIRONMENT]
-
+# Set the folder name of this example
 ```
 ## 2. Apply Landing zone
 
 Please make sure to change the cluster_key in /tf/caf/examples/applications/{app_example}/configuration.tfvars to choose the cluster to deploy this Application LZ to.
 
 ```bash
-application="argocd"
-# Landingzone key hosting the AKS cluster
-landingzone_key="cluster_aks"
-# Key of the cluster to deploy the application
-cluster_key="cluster_re1"
+app_example=ingress-nginx
 
 rover -lz /tf/caf/applications \
-  -tfstate ${application}1.tfstate \
-  -var-folder /tf/caf/examples/applications/${application} \
-  -var tags={application=\"${application}\"} \
+  -tfstate ${app_example}.tfstate \
+  -var-folder /tf/caf/examples/applications/${app_example} \
+  -var tags={application=\"${app_example}\"} \
   -level level4 \
   -env ${environment} \
   -a apply
 ```
-## 3. Destroy Landing zone
+
+## 3. Deploy Cluster Issuer
+```
+kubectl label namespace cert-manager cert-manager.io/disable-validation=true
+kubectl apply -f /tf/caf/examples/applications/${app_example}/cluster-issuer.yaml -n cert-manager
+```
+
+## 4. Destroy Landing zone
 Have fun playing with the landing zone an once you are done, you can simply delete the deployment using:
 
 ```bash
-application=argocd
-# Landingzone key hosting the AKS cluster
-landingzone_key="cluster_aks"
-# Key of the cluster to deploy the application
-cluster_key="cluster_re1"
+app_example=flux
 
 rover -lz /tf/caf/applications \
-  -tfstate ${landingzone_key}_${cluster_key}_${application}.tfstate \
-  -var-folder /tf/caf/examples/applications/${application} \
-  -var tags={application=\"${application}\"} \
-  -var landingzone_key=${landingzone_key} \
-  -var cluster_key=${cluster_key} \
+  -tfstate ${app_example}.tfstate \
+  -var-folder /tf/caf/examples/applications/${app_example} \
+  -var tags={application=\"${app_example}\"} \
   -level level4 \
   -a destroy -auto-approve
 ```

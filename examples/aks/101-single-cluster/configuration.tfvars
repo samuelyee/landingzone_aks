@@ -19,4 +19,9 @@ resource_groups = {
     name   = "aks-re1"
     region = "region1"
   }
+  
+  cosmosdb_region1 = {
+    name   = "cosmosdb"
+    region = "region1"
+  }
 }

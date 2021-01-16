@@ -26,6 +26,7 @@ rover -lz /tf/caf/applications \
   -var-folder /tf/caf/examples/applications/${app_example} \
   -var tags={application=\"${app_example}\"} \
   -level level4 \
+  -env ${environment} \
   -a apply
 ```
 ## 3. Destroy Landing zone

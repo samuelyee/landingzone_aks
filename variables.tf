@@ -104,3 +104,5 @@ variable azure_container_registries {
   default = {}
 }
 variable tenant_id {}
+
+variable prefix {}
