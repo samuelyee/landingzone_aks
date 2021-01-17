@@ -1,4 +1,5 @@
-public_ip_addresses = {
+
+ = {
   firewall_re1 = {
     name                    = "egress-pip1"
     resource_group_key      = "vnet_hub_re1"

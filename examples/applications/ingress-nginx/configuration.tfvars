@@ -24,6 +24,10 @@ namespaces = {
     labels = {
       mylabel = "ingress-nginx-value"
     }
+
+    sets = {
+      local.remote.public_ip_addresses["ingress_nginx_rg1"]
+    }
   }
 
   cert-manager = {

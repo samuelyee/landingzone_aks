@@ -40,7 +40,7 @@ kubectl apply -f /tf/caf/examples/applications/${app_example}/cluster-issuer.yam
 Have fun playing with the landing zone an once you are done, you can simply delete the deployment using:
 
 ```bash
-app_example=flux
+app_example=ingress-nginx
 
 rover -lz /tf/caf/applications \
   -tfstate ${app_example}.tfstate \

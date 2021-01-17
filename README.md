@@ -107,6 +107,7 @@ rover -lz /tf/caf/ \
 
 ### Install ingress-nginx and cert-manager in K8S
 Refer to README under `examples\applications\ingress-nginx`
+
 ## Login to AKS
 ```
 az aks get-credentials --resource-group staging-rg-aks-re1 --name staging-aks-akscluster-re1 --admin --overwrite

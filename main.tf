@@ -45,7 +45,8 @@ data "azurerm_client_config" "current" {}
 
 
 locals {
-
+  location = "southeastasia"
+  
   # Update the tfstates map
   tfstates = merge(
     map(var.landingzone.key,

@@ -6,7 +6,7 @@ module "caf_cosmos_db" {
   # rg name is at configuration.tfvar
   resource_group_name     = "${var.prefix}-rg-${var.resource_groups.cosmosdb_region1.name}"
   base_tags               = local.tags
-  location                = "southeastasia"
+  location                = local.location
   settings         =  {
       name                      = "${var.prefix}-mongodb"
       resource_group_key        = "cosmosdb_region1"
