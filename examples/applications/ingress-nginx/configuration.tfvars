@@ -25,9 +25,6 @@ namespaces = {
       mylabel = "ingress-nginx-value"
     }
 
-    sets = {
-      local.remote.public_ip_addresses["ingress_nginx_rg1"]
-    }
   }
 
   cert-manager = {
@@ -37,6 +34,7 @@ namespaces = {
     }
     labels = {
       mylabel = "cert-manager-value"
+      "cert-manager.io/disable-validation" = true
     }
   }
 }
@@ -47,6 +45,11 @@ helm_charts = {
     repository = "https://kubernetes.github.io/ingress-nginx"
     chart      = "ingress-nginx"
     namespace  = "ingress-nginx"
+    sets = {
+      "controller.replicaCount" = 2
+      "controller.service.loadBalancerIP" = "20.198.144.217"
+      "controller.service.annotations.service.beta.kubernetes.io/azure-dns-label-name" = "staging-cloudai-ingress"
+    }
   }
 
   cert-manager = {

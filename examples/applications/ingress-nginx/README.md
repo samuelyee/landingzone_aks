@@ -32,7 +32,6 @@ rover -lz /tf/caf/applications \
 
 ## 3. Deploy Cluster Issuer
 ```
-kubectl label namespace cert-manager cert-manager.io/disable-validation=true
 kubectl apply -f /tf/caf/examples/applications/${app_example}/cluster-issuer.yaml -n cert-manager
 ```
 

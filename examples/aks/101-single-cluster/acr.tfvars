@@ -3,6 +3,7 @@ azure_container_registries = {
     name               = "acr"
     resource_group_key = "aks_re1"
     sku                = "Standard"
+    admin_enabled      = true
     # georeplication_region_keys = ["region2"]
 
     # you can setup up to 5 key

@@ -106,9 +106,12 @@ rover -lz /tf/caf/ \
 ```
 
 ### Install ingress-nginx and cert-manager in K8S
-Refer to README under `examples\applications\ingress-nginx`
+Refer to README under `examples\applications\ingress-nginx`. Edit the `configurations.tfvars` for the static ip address and DNS label for the ingress-nginx controller.
 
 ## Login to AKS
 ```
 az aks get-credentials --resource-group staging-rg-aks-re1 --name staging-aks-akscluster-re1 --admin --overwrite
 ```
+
+## Service Principal for Azure Pipeline Connection
+A service principal is also created to grant Azure pipeline (Azure Resource Manager) with contributor access to the AKS cluster. The application id and password are stored in the launchpad keyvault (level 0)
