@@ -29,3 +29,32 @@ module "caf" {
     vnets = local.remote.vnets
   }
 }
+
+locals {
+  subscription_id = local.tfstates.cluster_aks["subscription_id"]
+  launchpad_rg    = local.tfstates.cluster_aks["resource_group_name"]
+}
+
+# create service principal for Azure Pipeline
+module "az_pipeline_sp" {
+  source = "./modules/az_pipeline"
+
+  prefix          = var.prefix
+  aks_rg_scope    = module.caf.resource_groups["aks_re1"]["rbac_id"]
+  subscription_id = local.subscription_id
+  launchpad_rg    = local.launchpad_rg
+  launchpad_kv_id = "/subscriptions/${local.subscription_id}/resourceGroups/${local.launchpad_rg}/providers/Microsoft.KeyVault/vaults/${var.prefix}-kv-level3"
+
+}
+
+module "database" {
+  source = "./modules/database"
+
+  prefix                = var.prefix
+  tags                  = local.tags
+  location              = local.location
+  # resource group name defined in configuration.tfvars
+  resource_group_name   = "${var.prefix}-rg-${var.resource_groups.cosmosdb_region1.name}"
+  launchpad_kv_id = "/subscriptions/${local.subscription_id}/resourceGroups/${local.launchpad_rg}/providers/Microsoft.KeyVault/vaults/${var.prefix}-kv-level3"
+}
+

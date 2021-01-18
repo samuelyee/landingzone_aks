@@ -10,12 +10,10 @@ output aks_clusters_kubeconfig {
 
 output resource_groups {
   value = {
-    resource_groups = module.caf.resource_groups
-    # tfstates = local.tfstates.launchpad["subscription_id"]
-    # global_settings = local.global_settings
-    # acr_rbac_id = var.azure_container_registries["acr1"]
+    # resource_groups = module.caf.resource_groups
+    tfstates = local.tfstates
   }
-  sensitive = true # toogle to false for debugging
+  sensitive = false # toogle to false for debugging
 }
 
 output aks_clusters {
