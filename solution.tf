@@ -50,11 +50,11 @@ module "az_pipeline_sp" {
 module "database" {
   source = "./modules/database"
 
-  prefix                = var.prefix
-  tags                  = local.tags
-  location              = local.location
+  prefix   = var.prefix
+  tags     = local.tags
+  location = local.location
   # resource group name defined in configuration.tfvars
-  resource_group_name   = "${var.prefix}-rg-${var.resource_groups.cosmosdb_region1.name}"
-  launchpad_kv_id = "/subscriptions/${local.subscription_id}/resourceGroups/${local.launchpad_rg}/providers/Microsoft.KeyVault/vaults/${var.prefix}-kv-level3"
+  resource_group_name = "${var.prefix}-rg-${var.resource_groups.cosmosdb_region1.name}"
+  launchpad_kv_id     = "/subscriptions/${local.subscription_id}/resourceGroups/${local.launchpad_rg}/providers/Microsoft.KeyVault/vaults/${var.prefix}-kv-level3"
 }
 

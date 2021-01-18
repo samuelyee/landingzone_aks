@@ -33,8 +33,8 @@ output virtual_machines {
 
 output ingress_nginx {
   value = {
-    fqdn        = module.caf_public_ip_addresses.fqdn
-    ip_address  = module.caf_public_ip_addresses.ip_address
+    fqdn       = module.caf_public_ip_addresses.fqdn
+    ip_address = module.caf_public_ip_addresses.ip_address
   }
   sensitive = false
 }

@@ -46,7 +46,7 @@ data "azurerm_client_config" "current" {}
 
 locals {
   location = "southeastasia"
-  
+
   # Update the tfstates map
   tfstates = merge(
     map(var.landingzone.key,
@@ -63,5 +63,5 @@ locals {
     ,
     data.terraform_remote_state.remote[var.landingzone.global_settings_key].outputs.tfstates
   )
-  
+
 }
