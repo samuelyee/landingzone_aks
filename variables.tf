@@ -106,3 +106,9 @@ variable azure_container_registries {
 variable tenant_id {}
 
 variable prefix {}
+
+variable developers {}
+
+variable mongo_db_names {
+  type = list(string)
+}

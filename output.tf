@@ -8,12 +8,21 @@ output aks_clusters_kubeconfig {
   sensitive = false
 }
 
-output resource_groups {
+output tfstates {
   value = {
     # resource_groups = module.caf.resource_groups
     tfstates = local.tfstates
   }
-  sensitive = false # toogle to false for debugging
+  sensitive = true # toogle to false for debugging
+}
+
+output azure_container_registries {
+  value = module.caf.azure_container_registries
+  sensitive = false
+}
+
+output tags {
+  value = local.tags
 }
 
 output aks_clusters {

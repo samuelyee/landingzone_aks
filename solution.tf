@@ -36,19 +36,22 @@ locals {
 }
 
 # create service principal for Azure Pipeline
-module "az_pipeline_sp" {
-  source = "./modules/az_pipeline"
+module "service_principals" {
+  source = "./tf_modules/service_principals"
 
-  prefix          = var.prefix
-  aks_rg_scope    = module.caf.resource_groups["aks_re1"]["rbac_id"]
-  subscription_id = local.subscription_id
-  launchpad_rg    = local.launchpad_rg
-  launchpad_kv_id = "/subscriptions/${local.subscription_id}/resourceGroups/${local.launchpad_rg}/providers/Microsoft.KeyVault/vaults/${var.prefix}-kv-level3"
-
+  prefix              = var.prefix
+  tenant_id           = var.tenant_id
+  developers          = var.developers
+  aks_rg_scope        = module.caf.resource_groups["aks_re1"]["rbac_id"]
+  subscription_id     = local.subscription_id
+  launchpad_rg        = local.launchpad_rg
+  launchpad_kv_id     = "/subscriptions/${local.subscription_id}/resourceGroups/${local.launchpad_rg}/providers/Microsoft.KeyVault/vaults/${var.prefix}-kv-level3"
+  az_docker_id        = module.caf.azure_container_registries["acr1"]["id"]
+  az_docker_server    = module.caf.azure_container_registries["acr1"]["login_server"]
 }
 
-module "database" {
-  source = "./modules/database"
+module "databases" {
+  source = "./tf_modules/databases"
 
   prefix   = var.prefix
   tags     = local.tags
@@ -56,5 +59,6 @@ module "database" {
   # resource group name defined in configuration.tfvars
   resource_group_name = "${var.prefix}-rg-${var.resource_groups.cosmosdb_region1.name}"
   launchpad_kv_id     = "/subscriptions/${local.subscription_id}/resourceGroups/${local.launchpad_rg}/providers/Microsoft.KeyVault/vaults/${var.prefix}-kv-level3"
+  mongo_db_names      = var.mongo_db_names
 }
 
