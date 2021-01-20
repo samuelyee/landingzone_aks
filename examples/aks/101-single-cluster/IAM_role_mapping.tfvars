@@ -4,9 +4,12 @@ azuread_groups = {
     description = "Provide admin access to the AKS cluster."
     members = {
       user_principal_names = [
-        "samuel-admin@projectinnovate.sg"
+        "samuel-admin@projectinnovate.sg",
+        "samuel@projectinnovate.sg",
+        "ziyun_lim@projectinnovate.sg",
+        "daowei@projectinnovate.sg",
       ]
-      # group_names = []
+      # group_names = [ "Cloud AI" ]
       # object_ids  = []
       # group_keys  = []
 
@@ -21,7 +24,7 @@ azuread_groups = {
     description = "Provide contributor access to the AKS cluster."
     members = {
       user_principal_names = []
-      group_names          = ["Cloud AI"]
+      group_names          = [ "Cloud AI" ]
       # object_ids  = []
       # group_keys  = []
 

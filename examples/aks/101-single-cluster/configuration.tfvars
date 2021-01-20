@@ -30,4 +30,9 @@ resource_groups = {
     name   = "cosmosdb"
     region = "region1"
   }
+
+  app_insights = {
+    name   = "app_insights"
+    region = "region1"
+  }
 }

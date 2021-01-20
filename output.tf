@@ -21,8 +21,10 @@ output azure_container_registries {
   sensitive = false
 }
 
-output tags {
-  value = local.tags
+output debug {
+  # value = module.caf.resource_groups
+  value = module.caf.azuread_groups
+  sensitive = false
 }
 
 output aks_clusters {
@@ -32,7 +34,7 @@ output aks_clusters {
 
 output global_settings {
   value     = local.global_settings
-  sensitive = false
+  sensitive = true
 }
 
 output virtual_machines {

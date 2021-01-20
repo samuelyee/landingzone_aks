@@ -42,3 +42,9 @@ resource "azurerm_role_assignment" "azure_pipeline" {
   principal_id         = azuread_service_principal.azure_pipeline.object_id
 }
 
+# grant AKS role
+resource "azuread_group_member" "azure_pipeline" {
+  group_object_id   = var.aks_contributors
+  member_object_id  = azuread_service_principal.azure_pipeline.object_id
+}
+

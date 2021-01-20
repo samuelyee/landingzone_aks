@@ -15,3 +15,5 @@ variable az_docker_server {}
 variable tenant_id {}
 
 variable developers {}
+
+variable aks_contributors {}

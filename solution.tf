@@ -1,3 +1,7 @@
+locals {
+  subscription_id = local.tfstates.cluster_aks["subscription_id"]
+  launchpad_rg    = local.tfstates.cluster_aks["resource_group_name"]
+}
 
 module "caf" {
   # source = "git::https://github.com/aztfmod/terraform-azurerm-caf.git?ref=HN-aks-addons"
@@ -30,9 +34,26 @@ module "caf" {
   }
 }
 
-locals {
-  subscription_id = local.tfstates.cluster_aks["subscription_id"]
-  launchpad_rg    = local.tfstates.cluster_aks["resource_group_name"]
+module "caf_app_insights" {
+  source  = "aztfmod/caf/azurerm//modules/app_insights"
+  version = "4.21.2"
+  # insert the 9 required variables here
+  name                = "${var.prefix}-appinsights"
+  application_type    = "web"
+
+  prefix              = var.prefix
+  resource_group_name = module.caf.resource_groups["app_insights"]["name"]
+  base_tags           = local.tags
+  tags                = local.tags
+  global_settings     = local.global_settings
+  location            = local.location
+}
+
+# store the "app-instrumentationkey" in keyvault
+resource "azurerm_key_vault_secret" "caf_app_insights" {
+  name         = "app-instrumentationkey"
+  value        = module.caf_app_insights.instrumentation_key
+  key_vault_id = "/subscriptions/${local.subscription_id}/resourceGroups/${local.launchpad_rg}/providers/Microsoft.KeyVault/vaults/${var.prefix}-kv-level3"
 }
 
 # create service principal for Azure Pipeline
@@ -48,6 +69,7 @@ module "service_principals" {
   launchpad_kv_id     = "/subscriptions/${local.subscription_id}/resourceGroups/${local.launchpad_rg}/providers/Microsoft.KeyVault/vaults/${var.prefix}-kv-level3"
   az_docker_id        = module.caf.azure_container_registries["acr1"]["id"]
   az_docker_server    = module.caf.azure_container_registries["acr1"]["login_server"]
+  aks_contributors    = module.caf.azuread_groups["aks_contributors"]["rbac_id"]
 }
 
 module "databases" {
