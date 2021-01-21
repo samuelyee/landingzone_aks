@@ -21,15 +21,15 @@ resource "azuread_service_principal" "docker" {
 }
 
 # store the docker url for keyvault
-resource "azurerm_key_vault_secret" "docker_url" {
-  name         = "docker-id"
-  value        = "https://${var.az_docker_server}"
+resource "azurerm_key_vault_secret" "docker_server" {
+  name         = "docker-server"
+  value        = var.az_docker_server
   key_vault_id = var.launchpad_kv_id
 }
 
 # store the docker id for keyvault
-resource "azurerm_key_vault_secret" "docker_id" {
-  name         = "docker-id"
+resource "azurerm_key_vault_secret" "docker_username" {
+  name         = "docker-username"
   value        = azuread_service_principal.docker.application_id
   key_vault_id = var.launchpad_kv_id
 }

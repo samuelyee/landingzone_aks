@@ -70,6 +70,7 @@ module "service_principals" {
   az_docker_id        = module.caf.azure_container_registries["acr1"]["id"]
   az_docker_server    = module.caf.azure_container_registries["acr1"]["login_server"]
   aks_contributors    = module.caf.azuread_groups["aks_contributors"]["rbac_id"]
+  aks_admins          = module.caf.azuread_groups["aks_admins"]["rbac_id"]
 }
 
 module "databases" {
