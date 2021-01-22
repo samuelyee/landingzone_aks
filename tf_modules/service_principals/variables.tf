@@ -17,5 +17,3 @@ variable tenant_id {}
 variable developers {}
 
 variable aks_contributors {}
-
-variable aks_admins {}
